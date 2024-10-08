@@ -14,3 +14,10 @@
 
 %%%%% SECTION: equalEntries
 %%%%% Put your rules for equalEntries below
+
+len([], 0).
+len([H|T], N):- len(T, N1), N is N1+1.
+
+equalEntries([], [], []).
+equalEntries([H1|T1], [H2|T2], [true| EqI]):- len([H1|T1], L1), len([H2|T2], L2), L1 = L2, H1==H2, equalEntries(T1, T2, EqI).
+equalEntries([H1|T1], [H2|T2], [false| EqI]):- len([H1|T1], L1), len([H2|T2], L2), L1 = L2, not(H1==H2), equalEntries(T1, T2, EqI).
