@@ -24,3 +24,14 @@ pathClear(r4, net).    pathClear(r1, r5).    pathClear(r5, r6).
 
 %%%%% SECTION: robocup
 %%%%% Put your rules for canPass, canScore, and any helper predicates below
+
+myappend([ ],List,List).
+myappend([X | List1], List2,[X | Result]) :- append(List1,List2,Result).
+
+canPass(R1, R2, M, [R1, R2]):- not R1 = net, not R2 = net, not R1 = R2, M >= 1, pathClear(R1, R2).
+canPass(R1, R2, M, [R1, R2]):- not R1 = net, not R2 = net, not R1 = R2, M >= 1, pathClear(R2, R1).
+canPass(R1, R2, M, [R1 | P]):- not R1 = net, not R2 = net, not R1 = R2, M1 is M-1, M1 >= 1, pathClear(R1, R3), canPass(R3, R2, M1, P).
+canPass(R1, R2, M, [R1 | P]):- not R1 = net, not R2 = net, not R1 = R2, M1 is M-1, M1 >= 1, pathClear(R3, R1), canPass(R3, R2, M1, P).
+
+canScore(R, M, [R, net]):- hasBall(R), M >= 1, pathClear(R, net).
+canScore(R, M, Path):- hasBall(R1), M1 is M-1, M1 >= 1, canPass(R1, R, M1, P), pathClear(R, net), myappend(P, [net], Path).
