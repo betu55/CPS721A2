@@ -2,9 +2,9 @@
 % If you only have 2 group members, leave the last space blank
 %
 %%%%%
-%%%%% NAME: 
-%%%%% NAME:
-%%%%% NAME:
+%%%%% NAME: Michael AbdElsayed
+%%%%% NAME: Bemenet Bekele
+%%%%% NAME: Subha Tasnim
 %
 % Add the required rules in the corresponding sections. 
 % If you put the rules in the wrong sections, you will lose marks.
@@ -26,13 +26,7 @@
 % Test Tree 1
 % This tree has a root named a, which has 3 leaf children named 1, 2, 3
 % The expected answer for preorder on this tree is next(a, next(1, next(2, next(3, nil))))
-testTree(1,
-    tree3(a,
-            tree3(1, none, none, none),
-            tree3(2, none, none, none),
-            tree3(3, none, none, none)
-        )
-).
+testTree(1, tree3(a,tree3(1, none, none, none), tree3(2, none, none, none),tree3(3, none, none, none))).
 
 % This is the tree from the assignment description.
 % See the expected answer for preorder there
@@ -57,3 +51,19 @@ testTree(2,
 
 %%%%% SECTION: preorder
 %%%%% Put your rules for preorder and any helper predicates below
+
+preorder(none, nil).
+
+%recursive case
+preorder(tree3(Name, Left, Middle, Right), next(Name, List)) :-
+    preorder(Left, LeftList),
+    preorder(Middle, MiddleList),
+    preorder(Right, RightList),
+    % Concatenate the lists together
+    concat_lists(LeftList, MiddleList, TempList),
+    concat_lists(TempList, RightList, List).
+
+% Helper predicate to concatenate two lists together.
+concat_lists(nil, List, List).
+concat_lists(next(Head, Tail), List, next(Head, Result)) :-
+    concat_lists(Tail, List, Result).
