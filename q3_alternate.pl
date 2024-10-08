@@ -17,11 +17,14 @@
 
 alternatePlusMinus([], 0).
 
-% initial call to alternatePlusMinusHelper
-alternatePlusMinus(List, Result) :- alternatePlusMinusHelper(List, Result, plus).
+% initial call to helper predicate
+alternatePlusMinus([Head|Tail], Result) :- alternateSigns(Tail, NewSubList, plus), sum_list([Head|NewSubList], Result).
 
-alternatePlusMinusHelper([], 0, _).
+% here we are making a new list with the elements of the original lists tail but with alternating signs. We will use this later with the sum_list predicate to find the sum.
+alternateSigns([], [], _).
+alternateSigns([Head|Tail], [NewHead|NewTail], plus) :- NewHead is Head, alternateSigns(Tail, NewTail, minus).
+alternateSigns([Head|Tail], [NewHead|NewTail], minus) :- NewHead is -Head, alternateSigns(Tail, NewTail, plus).
 
-alternatePlusMinusHelper([Head|Tail], Result, plus) :- alternatePlusMinusHelper(Tail, SubResult, minus), Result is Head + SubResult.
+sum_list([], 0).
+sum_list([Head|Tail], Result) :- sum_list(Tail, SubResult), Result is Head + SubResult.
 
-alternatePlusMinusHelper([Head|Tail], Result, minus) :- alternatePlusMinusHelper(Tail, SubResult1, plus), Result is SubResult1 - Head.
