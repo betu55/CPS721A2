@@ -25,13 +25,17 @@ pathClear(r4, net).    pathClear(r1, r5).    pathClear(r5, r6).
 %%%%% SECTION: robocup
 %%%%% Put your rules for canPass, canScore, and any helper predicates below
 
+lMember(X, [X | Tail]).
+lMember(X, [Head | Tail]) :- member(X,Tail).
+
+validPass(R1, R2):- robot(R1), robot(R2), not R1 = R2, pathClear(R1, R2).
+validPass(R1, R2):- robot(R1), robot(R2), not R1 = R2, pathClear(R2, R1).
+
 myappend([ ],List,List).
 myappend([X | List1], List2,[X | Result]) :- append(List1,List2,Result).
 
-canPass(R1, R2, M, [R1, R2]):- not R1 = net, not R2 = net, not R1 = R2, M >= 1, pathClear(R1, R2).
-canPass(R1, R2, M, [R1, R2]):- not R1 = net, not R2 = net, not R1 = R2, M >= 1, pathClear(R2, R1).
-canPass(R1, R2, M, [R1 | P]):- not R1 = net, not R2 = net, not R1 = R2, M1 is M-1, M1 >= 1, pathClear(R1, R3), canPass(R3, R2, M1, P).
-canPass(R1, R2, M, [R1 | P]):- not R1 = net, not R2 = net, not R1 = R2, M1 is M-1, M1 >= 1, pathClear(R3, R1), canPass(R3, R2, M1, P).
+canPass(R1, R2, M, [R1, R2]):- validPass(R1, R2), M >= 1.
+canPass(R1, R2, M, [R1 | [A1 | B1]]):- validPass(R1, R3), not R1 = R2, M >= 2, M1 is M-1, M1 >= 1, canPass(R3, R2, M1, [A1 | B1]), not lMember(R3, B1), not lMember(R1, B1).
 
 canScore(R, M, [R, net]):- hasBall(R), M >= 1, pathClear(R, net).
-canScore(R, M, Path):- hasBall(R1), M1 is M-1, M1 >= 1, canPass(R1, R, M1, P), pathClear(R, net), myappend(P, [net], Path).
+canScore(R, M, Path):- hasBall(R1), M >= 2, M1 is M - 1, M1 >= 1, canPass(R1, R, M1, [A2 | B2]), not lMember(R1, B2), pathClear(R, net), myappend([A2 | B2], [net], Path).
