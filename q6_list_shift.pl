@@ -15,7 +15,7 @@
 %%%%% SECTION: listShift
 %%%%% Put your rules for listShift and any helper predicates below
 
-listShift(nil, _, nil).
+listShift(nil, S, nil).
 listShift(List, 0, List).
 listShift(List, V, Result) :- list_length(List, Length), V1 is V mod Length, shift_n_times(List, V1, Result).
 
@@ -31,4 +31,4 @@ my_append(next(Head, Tail), List, next(Head, Result)) :- my_append(Tail, List, R
 
 % finding the length of our list
 list_length(nil, 0).
-list_length(next(_, Tail), Length) :- list_length(Tail, SubLength), Length is SubLength + 1.
+list_length(next(S, Tail), Length) :- list_length(Tail, SubLength), Length is SubLength + 1.

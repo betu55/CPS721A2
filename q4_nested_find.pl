@@ -15,42 +15,57 @@
 %%%%% SECTION: nestedLists
 %%%%% Put your rules for nestedFindDepth, nestedFindIndex, and any helper predicates below
 
-nestedFindDepth(List, Item, Depth) :-
-    nestedFindDepth(List, Item, 0, Depth).
+nestedFindDepth([Item|T], Item, 0).
+nestedFindDepth([I|Tail], Item, Depth) :- nestedFindDepth(Tail, Item, Depth).
 
-% Base case: if the item matches and its not a list, return the current depth.
-nestedFindDepth(Item, Item, Depth, Depth) :-
-    \+ is_list(Item).
+nestedFindDepth(List, Item, Depth) :- nestedFindDepthHelper(List, Item, 0, Depth).
+nestedFindDepthHelper([], I, CD, D) :- fail.
 
-% search the head of the list.
-nestedFindDepth([Head|Tail], Item, CurrentDepth, Depth) :-
-    (nestedFindDepth(Head, Item, CurrentDepth, Depth) ;
-    nestedFindDepth(Tail, Item, CurrentDepth, Depth)).
-
-% if the current element is a list, increment the depth and continue search.
-nestedFindDepth(List, Item, CurrentDepth, Depth) :-
-    is_list(List),
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :-
+    is_list(Head),
     NextDepth is CurrentDepth + 1,
-    nestedFindDepth(List, Item, NextDepth, Depth).
+    nestedFindDepthHelper(Head, Item, NextDepth, Depth).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :-
+    is_list(Head),
+    nestedFindDepthHelper(Tail, Item, CurrentDepth, Depth).
+
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :-
+    not(is_list(Head)),
+    Head = Item,
+    Depth = CurrentDepth.
+
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :-
+    not(is_list(Head)),
+    nestedFindDepthHelper(Tail, Item, CurrentDepth, Depth).
+
+nestedFindIndex([Item|T], Item, 0, 0).
+nestedFindIndex([I|Tail], Item, Depth, Index) :-
+    nestedFindIndex(Tail, Item, Depth, NextIndex),
+    Index is NextIndex + 1.
+
 
 nestedFindIndex(List, Item, Depth, Index) :-
-    nestedFindIndex(List, Item, 0, Depth, 0, Index).
+    nestedFindIndexHelper(List, Item, 0, 0, Depth, Index).
 
-% Base case: if the item matches and its not a list, return the current depth and index.
-nestedFindIndex(Item, Item, Depth, Depth, Index, Index) :-
-    \+ is_list(Item).
-
-% search the head of the list and keep track of the index.
-nestedFindIndex([Head|Tail], Item, CurrentDepth, Depth, CurrentIndex, Index) :-
-    nestedFindIndex(Head, Item, CurrentDepth, Depth, CurrentIndex, Index).
-nestedFindIndex([_|Tail], Item, CurrentDepth, Depth, CurrentIndex, Index) :-
-    NextIndex is CurrentIndex + 1,
-    nestedFindIndex(Tail, Item, CurrentDepth, Depth, NextIndex, Index).
-
-% if the current element is a list, increment the depth and continue searching.
-nestedFindIndex(List, Item, CurrentDepth, Depth, Index, Index) :-
-    is_list(List),
+nestedFindIndexHelper([], I, CD, CI, D, I) :- fail.
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :-
+    is_list(Head),
     NextDepth is CurrentDepth + 1,
-    nestedFindIndex(List, Item, NextDepth, Depth, Index, Index).
+    nestedFindIndexHelper(Head, Item, NextDepth, CurrentIndex, Depth, Index).
+
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :-
+    is_list(Head),
+    NextIndex is CurrentIndex + 1,
+    nestedFindIndexHelper(Tail, Item, CurrentDepth, NextIndex, Depth, Index).
+
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :-
+    not(is_list(Head)),
+    Head = Item,
+    Depth = CurrentDepth,
+    Index = CurrentIndex.
+
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :-
+    not(is_list(Head)),
+    NextIndex is CurrentIndex + 1,
+    nestedFindIndexHelper(Tail, Item, CurrentDepth, NextIndex, Depth, Index).

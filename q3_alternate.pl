@@ -21,7 +21,7 @@ alternatePlusMinus([], 0).
 alternatePlusMinus([Head|Tail], Result) :- alternateSigns(Tail, NewSubList, plus), sum_list([Head|NewSubList], Result).
 
 % here we are making a new list with the elements of the original lists tail but with alternating signs. We will use this later with the sum_list predicate to find the sum.
-alternateSigns([], [], _).
+alternateSigns([], [], S).
 alternateSigns([Head|Tail], [NewHead|NewTail], plus) :- NewHead is Head, alternateSigns(Tail, NewTail, minus).
 alternateSigns([Head|Tail], [NewHead|NewTail], minus) :- NewHead is -Head, alternateSigns(Tail, NewTail, plus).
 
