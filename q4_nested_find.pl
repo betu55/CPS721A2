@@ -15,12 +15,31 @@
 %%%%% SECTION: nestedLists
 %%%%% Put your rules for nestedFindDepth, nestedFindIndex, and any helper predicates below
 
-nestedFindDepth(List, Item, 0):- List == Item.
-nestedFindDepth([H | T], Item, 0):- H == Item.
-nestedFindDepth([H | T], Item, Depth):- is_list(H), nestedFindDepth(H, Item, D1), Depth is D1 + 1.
-nestedFindDepth([H | T], Item, Depth):- nestedFindDepth(T, Item, Depth).
+nestedFindDepth([Item|T], Item, 0).
+nestedFindDepth([I|Tail], Item, Depth) :- nestedFindDepth(Tail, Item, Depth).
 
-nestedFindIndex(List, Item, 0, 0):- List == Item.
-nestedFindIndex([H | T], Item, 0, 0):- H == Item.
-nestedFindIndex([H | T], Item, Depth, Index):- is_list(H), nestedFindDepth(H, Item, D1), Depth is D1 + 1, nestedFindIndex(T, Item, Depth, Index).
-nestedFindDepth([H | T], Item, Depth, Index):- nestedFindIndex(T, Item, Depth, I1), Index is I1 + 1.
+nestedFindDepth(List, Item, Depth) :- nestedFindDepthHelper(List, Item, 0, Depth).
+nestedFindDepthHelper([], I, CD, D):- fail.
+
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :- is_list(Head), NextDepth is CurrentDepth + 1, nestedFindDepthHelper(Head, Item, NextDepth, Depth).
+
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :- is_list(Head), nestedFindDepthHelper(Tail, Item, CurrentDepth, Depth).
+
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth):- not(is_list(Head)), Head = Item,Depth = CurrentDepth.
+
+nestedFindDepthHelper([Head|Tail], Item, CurrentDepth, Depth) :-not(is_list(Head)), nestedFindDepthHelper(Tail, Item, CurrentDepth, Depth).
+
+nestedFindIndex([Item|T], Item, 0, 0).
+nestedFindIndex([I|Tail], Item, Depth, Index) :- nestedFindIndex(Tail, Item, Depth, NextIndex),Index is NextIndex + 1.
+
+
+nestedFindIndex(List, Item, Depth, Index) :- nestedFindIndexHelper(List, Item, 0, 0, Depth, Index).
+
+nestedFindIndexHelper([], I, CD, CI, D, I) :- fail.
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :- is_list(Head), NextDepth is CurrentDepth + 1, nestedFindIndexHelper(Head, Item, NextDepth, CurrentIndex, Depth, Index).
+
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :- is_list(Head), NextIndex is CurrentIndex + 1,nestedFindIndexHelper(Tail, Item, CurrentDepth, NextIndex, Depth, Index).
+
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :- not(is_list(Head)), Head = Item, Depth = CurrentDepth, Index = CurrentIndex.
+
+nestedFindIndexHelper([Head|Tail], Item, CurrentDepth, CurrentIndex, Depth, Index) :- not(is_list(Head)),NextIndex is CurrentIndex + 1, nestedFindIndexHelper(Tail, Item, CurrentDepth, NextIndex, Depth, Index).
